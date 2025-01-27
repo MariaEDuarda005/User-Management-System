@@ -1,0 +1,8 @@
+<nav>
+    <ul>
+        <li *ngIf="!isAuthentication"><a routerLink="/login">Phegon Dev</a></li>
+        <li *ngIf="isAuthentication"><a routerLink="/profile">Profile</a></li>
+        <li *ngIf="isAuthentication && isAdmin"><a routerLink="/users">Users Managemente</a></li>
+        <li *ngIf="isAuthentication"><a routerLink="" (click)="logout()">Logout</a></li>
+    </ul>
+</nav>
