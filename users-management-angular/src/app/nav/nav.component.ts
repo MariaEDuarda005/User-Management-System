@@ -23,21 +23,16 @@ export class NavComponent implements OnInit{
   ){}
 
   ngOnInit(): void {
-    // Atualize os estados de autenticação e papel do usuário
-    this.checkAuthenticationStatus();
-  }
-
-  // Função para atualizar os estados de autenticação e papel
-  checkAuthenticationStatus(): void {
-    this.isAuthentication = this.userService.isAuthentication();
-    this.isAdmin = this.userService.isAdmin();
-    this.isUser = this.userService.isUser();
-    console.log('Auth:', this.isAuthentication, 'Admin:', this.isAdmin, 'User:', this.isUser);
+      // Inscreva-se para ouvir as mudanças de estado de autenticação
+      this.userService.authStatus$.subscribe(authenticated => {
+      this.isAuthentication = authenticated;
+      this.isAdmin = this.userService.isAdmin();
+      this.isUser = this.userService.isUser();
+    });
   }
 
   logout():void{
     this.userService.logOut();  // Limpa os dados do usuário
-    this.checkAuthenticationStatus();  // Atualiza o estado após o logout
     this.router.navigate(['/login']);  // Redireciona para a página de login
   }
 }

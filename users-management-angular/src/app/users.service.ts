@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +10,23 @@ export class UsersService {
 
   private BASE_URL = "http://localhost:1010"
 
+  // problema na verificação do localStorage que não é reativa
+  // Quando o login é realizado, o estado de autenticação e o papel do usuário mudam, mas o Angular não sabe disso até a próxima renderização.
+
+  private authStatusSubject = new BehaviorSubject<boolean>(this.isAuthentication()); // Estado de autenticação
+  authStatus$ = this.authStatusSubject.asObservable(); // Observável
+
   constructor(private http: HttpClient) { }
 
   async login(email:string, password:string): Promise<any>{
     const url = `${this.BASE_URL}/auth/login`;
     try{
-      const response = await this.http.post<any>(url, {email, password}).toPromise()
+      const response = await this.http.post<any>(url, {email, password}).toPromise();;
+      if (response.token && response.role) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('role', response.role);
+        this.authStatusSubject.next(true); // Notifica que o usuário está autenticado
+      }
       return response;
     }catch(error){
       throw error;
@@ -27,7 +39,7 @@ export class UsersService {
       'Authorization': `Bearer ${token}`
     })
     try{
-      const response = await this.http.post<any>(url, userData, {headers}).toPromise()
+      const response = await this.http.post<any>(url, userData, {headers}).toPromise();
       return response;
     }catch(error){
       throw error;
@@ -40,7 +52,7 @@ export class UsersService {
       'Authorization': `Bearer ${token}`
     })
     try{
-      const response = await this.http.get<any>(url, {headers}).toPromise()
+      const response = await this.http.get<any>(url, {headers}).toPromise();
       return response;
     }catch(error){
       throw error;
@@ -53,7 +65,7 @@ export class UsersService {
       'Authorization': `Bearer ${token}`
     })
     try{
-      const response = await this.http.get<any>(url, {headers}).toPromise()
+      const response = await this.http.get<any>(url, {headers}).toPromise();
       return response;
     }catch(error){
       throw error;
@@ -66,7 +78,7 @@ export class UsersService {
       'Authorization': `Bearer ${token}`
     })
     try{
-      const response = await this.http.get<any>(url, {headers}).toPromise()
+      const response = await this.http.get<any>(url, {headers}).toPromise();
       return response;
     }catch(error){
       throw error;
@@ -79,7 +91,7 @@ export class UsersService {
       'Authorization': `Bearer ${token}`
     })
     try{
-      const response = await this.http.delete<any>(url, {headers}).toPromise()
+      const response = await this.http.delete<any>(url, {headers}).toPromise();
       return response;
     }catch(error){
       throw error;
@@ -92,7 +104,7 @@ export class UsersService {
       'Authorization': `Bearer ${token}`
     })
     try{
-      const response = await this.http.put<any>(url, userData, {headers}).toPromise()
+      const response = await this.http.put<any>(url, userData, {headers}).toPromise();
       return response;
     }catch(error){
       throw error;
@@ -100,10 +112,12 @@ export class UsersService {
   }
 
   /* Authentications methods */
+
   logOut():void{
     if(typeof window !== 'undefined' && localStorage){
-      localStorage.removeItem('token')
-      localStorage.removeItem('role')
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      this.authStatusSubject.next(false); // Notifica que o usuário foi deslogado
     }
   }
 
