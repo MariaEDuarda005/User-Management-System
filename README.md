@@ -21,7 +21,7 @@ Este é um projeto de estudo focado no gerenciamento de usuários, desenvolvido 
 
 1. Clone o repositório:
     ```bash
-    [repositório do github](https://github.com/MariaEDuarda005/User-Management-System.git)
+    https://github.com/MariaEDuarda005/User-Management-System.git
     ```
 
 #### Passos do Frontend:
